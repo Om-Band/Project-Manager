@@ -3,10 +3,11 @@
   "version": "1.0.0",
   "description": "a project management system for beginner",
   "main": "index.js",
-"type": "module",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node index.js"
+    "dev": "nodemon index.js",
+    "start": "node index.js"
   },
   "keywords": [
     "udemy",
@@ -17,5 +18,12 @@
     "creation"
   ],
   "author": "Om Band",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.14",
+    "prettier": "3.9.10"
+  },
+  "dependencies": {
+    "dotenv": "^18.0.8"
+  }
 }
