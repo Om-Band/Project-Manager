@@ -1,7 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import crypto from " crypto";
+import crypto from "crypto";
 
 const userSchema = new Schema(
   {
@@ -42,7 +42,7 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    RefereshToken: {
+    refreshToken: {
       type: String,
     },
     ForgotPasswordToken: {
@@ -73,7 +73,7 @@ userSchema.methods.isPasswordCorrect = async function (password) {
 };
 
 userSchema.methods.generateAccessToken = function () {
-  jwt.sign(
+  return jwt.sign(
     {
       _id: this._id,
       email: this.email,
@@ -101,7 +101,7 @@ userSchema.methods.generateRefreshToken = function () {
 };
 
 userSchema.methods.generateTemporaryToken = function () {
-  crypto.randomBytes(20).toString("hex");
+  const unHashedToken = crypto.randomBytes(20).toString("hex");
 
   const hashedToken = crypto
     .createHash("sha256")

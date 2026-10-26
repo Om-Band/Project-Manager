@@ -10,17 +10,23 @@ app.use(express.static("public"));
 //cors configuration
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN?.split(",") || "http://localhost5173",
-    Credential: true,
-    method: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowHeaders: ["Authorization", "Content-Type"],
+    origin: process.env.CORS_ORIGIN?.split(",") || "http://localhost:5173",
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Authorization", "Content-Type"],
   }),
 );
 
 
 //import the routes 
 import { healthCheckRouter } from "./routes/healthcheck.routes.js";
-app.use("/api/v1/healtcheck",healthCheckRouter);
+import {authRouter} from"./routes/auth.routes.js"
+
+
+
+app.use("/api/v1/healthcheck", healthCheckRouter);
+app.use("/api/v1/healtcheck", healthCheckRouter);
+app.use("/api/v1/auth",authRouter);
 
 
 app.get("/", (req, res) => {
