@@ -78,7 +78,7 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 const login = asyncHandler(async (req, res) => {
-  const { email, password, username } = req.body();
+  const { email, password, username } = req.body;
   if (!email) {
     throw new ApiError(400, "username or email is not registered");
   }
