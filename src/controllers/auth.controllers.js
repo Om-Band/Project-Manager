@@ -3,6 +3,7 @@ import { ApiResponse } from "../utils/api-response.js";
 import { asyncHandler } from "../utils/async-handler.js";
 import { ApiError } from "../utils/api-error.js";
 import { emailVerificationMailgenContent, sendEmail } from "../utils/mail.js";
+import { json } from "express";
 
 const generateAccessAndRefreshTokens = async (userId) => {
   try {
@@ -59,11 +60,9 @@ const registerUser = asyncHandler(async (req, res) => {
       `${req.protocol}://${req.get("host")}/api/v1/users/verify-email/${unHashedToken}`,
     ),
   });
-  const createdUser = await User
-    .findById(user._id)
-    .select(
-      "-password -refreshToken -emailVerificationToken -emailVerificationExpiry",
-    );
+  const createdUser = await User.findById(user._id).select(
+    "-password -refreshToken -emailVerificationToken -emailVerificationExpiry",
+  );
   if (!createdUser) {
     throw new ApiError(500, "something went wrong while registering user");
   }
@@ -78,5 +77,49 @@ const registerUser = asyncHandler(async (req, res) => {
     );
 });
 
+const login = asyncHandler(async (req, res) => {
+  const { email, password, username } = req.body();
+  if (!email) {
+    throw new ApiError(400, "username or email is not registered");
+  }
+  const user = await User.findOne({ email });
 
-export{registerUser};
+  if (!user) {
+    throw new ApiError(400, "user doesn't exist");
+  }
+
+  const isPasswordValid = await user.isPasswordCorrect(password);
+
+  if (!isPasswordValid) {
+    throw new ApiError(400, "Invalid Credentials");
+  }
+
+  const { accessToken, refreshToken } = await generateAccessAndRefreshTokens(
+    user._id,
+  );
+
+  const LoggedInUser = await User.findById(user._id).select(
+    "-password -refreshToken -emailVerificationToken -emailVerificationExpiry",
+  );
+
+  const options = {
+    httpOnly: true,
+    secure: true,
+  };
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, options)
+    .cookie("refreshToken", refreshToken, options)
+    .json(
+      new ApiResponse(
+        200,
+        {
+          user: LoggedInUser,
+          accessToken,
+          refreshToken,
+        },
+        "User Logged in Successfully",
+      ),
+    );
+});
+export { registerUser, login };
